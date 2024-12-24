@@ -89,18 +89,16 @@ public abstract class AbstractDAO<T> {
             // SELECT - X
 
             //HW-1
-            try (Statement statement = conn.createStatement()) { //пытаемся подключиться к базе данных с помощью обьекта
-                //интерфейса Statement
-                try (ResultSet rs = statement.executeQuery("SELECT * FROM + table")) { //в обьект типа ResultSet пытаемся
-                    //положить результат запроса, который мы выполняем с помощью метода executeQuery() через обьект класса Statement
-                    //(SELECT относится к операторам для получения данных из таблицы)
-                    while (rs.next()) { //пока есть строки для чтения из таблици, мы
-                        int intId = rs.getInt(1); //обьявляем целочисленную переменную = методу rs.getInt(1),
-                        //который вернет данные N-й(для нас под №1, как альтернативу можно использовать название колонки -"id") колонки
-                        // текущей строки как тип int
-                        id.setAccessible(true); //открываем доступ к изменению данных
-                        id.set(t, intId); //устанавливаем для поля id значения
-
+            try (Statement statement = conn.createStatement()) { // спробуємо підключитися до бази даних за допомогою об'єкта
+                // інтерфейсу Statement
+                try (ResultSet rs = statement.executeQuery("SELECT * FROM + table")) { // у об'єкт типу ResultSet намагаємося
+                    // зберегти результат запиту, який ми виконуємо за допомогою методу executeQuery() через об'єкт класу Statement
+                    // (SELECT відноситься до операторів для отримання даних з таблиці)
+                    while (rs.next()) { // поки є рядки для читання з таблиці, ми
+                    int intId = rs.getInt(1); // оголошуємо ціле числове значення для змінної, що містить результат методу rs.getInt(1),
+                    // який повертає дані з N-го стовпця поточного рядка (для нас під №1, як альтернативу можна використовувати назву колонки -"id") як тип int
+                    id.setAccessible(true); // відкриваємо доступ до зміни даних
+                    id.set(t, intId); // встановлюємо для поля id значення
                     }
                 }
             }
@@ -160,44 +158,45 @@ public abstract class AbstractDAO<T> {
     }
 
     //HW-2
-    public List<T> getAll(Class<T> cls, String... columnsNames) { //для метода вернутьВсех в качестве второго параметра добавляем
-        //параметр переменной длины (varArgs - по-сути это массив) типа String - для данных, которые будут инициализировать
-        // название столбцов таблици
-        List<T> res = new ArrayList<>(); //обьявляен список res с интерфейсом List типом дженерик с поведением класса ArrayList
+    public List<T> getAll(Class<T> cls, String... columnsNames) { //для методу getAll як другий параметр додаємо
+        // параметр змінної довжини (varArgs - по суті це масив) типу String - для даних, які будуть ініціалізувати
+        // назви стовпців таблиці
+        List<T> res = new ArrayList<>(); //оголошуємо список res з інтерфейсом List і типом дженерик з поведінкою класу ArrayList
 
         try {
-            try (Statement st = conn.createStatement()) { //пытаемся подключиться к базе данных с помощью обьекта
-                //интерфейса Statement
-                try (ResultSet rs = st.executeQuery("SELECT * FROM " + table)) { //в обьект типа ResultSet пытаемся
-                    //положить результат запроса, который мы выполняем с помощью метода executeQuery() через обьект класса
-                    // Statement (SELECT относится к операторам для получения данных из таблицы)
-                    ResultSetMetaData md = rs.getMetaData(); //получаем обьект интерфейса ResultSetMetaData для получения
-                    //информации о таблице от сервера SQL
+            try (Statement st = conn.createStatement()) { //намагаємось підключитися до бази даних через об'єкт
+                // інтерфейсу Statement
+                try (ResultSet rs = st.executeQuery("SELECT * FROM " + table)) { //в об'єкт типу ResultSet намагаємось
+                    // помістити результат запиту, який виконується через метод executeQuery() за допомогою об'єкта класу
+                    // Statement (SELECT — це оператор для отримання даних з таблиці)
+                    ResultSetMetaData md = rs.getMetaData(); //отримуємо об'єкт інтерфейсу ResultSetMetaData для отримання
+                    // інформації про таблицю від сервера SQL
 
-                    while (rs.next()) { //пока есть что считывать
-                        T t = cls.getDeclaredConstructor().newInstance(); //!!! //инициализируем дженерик создавая новый обьект
-                        //на основании типа класса самого дженерика, который может вызвать любой заддекларированный конструктор,
-                        // независимо от числа параметров
+                    while (rs.next()) { //поки є що зчитувати
+                        T t = cls.getDeclaredConstructor().newInstance(); //!!! //ініціалізуємо дженерик, створюючи новий об'єкт
+                        // на основі типу класу самого дженерика, який може викликати будь-який задекларований конструктор,
+                        // незалежно від кількості параметрів
 
-                        for (String columnFromVarArgs : columnsNames) { //проходимся по каждому элементу параметра переменной
-                            //длины(varArgs - массив) - т.е. по каждому названию всех столбцов таблицы
-                            for (int i = 1; i <= md.getColumnCount(); i++) { //через ResultSetMetaData получаем количество
-                                // столбцов таблицы и для каждого столбца:
-                                String columnNameFromMetaDate = md.getColumnName(i); //обьявляем переменную и кладем в нее
-                                //название столбца полученное с помощью ResultSetMetaData
-                                if (columnNameFromMetaDate.equals(columnFromVarArgs)) { //если названия столбцов совпадают, то
-                                    Field field = cls.getDeclaredField(columnNameFromMetaDate); //создаем поле класса Field и
-                                    //инициализируем его по типу дженерика,
-                                    field.setAccessible(true); //открываем доступ,чтобы получить доступ к приватному полю класса
+                        for (String columnFromVarArgs : columnsNames) { //проходимося по кожному елементу параметра змінної
+                            // довжини (varArgs - масив) - тобто по кожному назві стовпців таблиці
+                            for (int i = 1; i <= md.getColumnCount(); i++) { //через ResultSetMetaData отримуємо кількість
+                                // стовпців таблиці і для кожного стовпця:
+                                String columnNameFromMetaDate = md.getColumnName(i); //оголошуємо змінну і кладемо в неї
+                                // назву стовпця, отриману через ResultSetMetaData
+                                if (columnNameFromMetaDate.equals(columnFromVarArgs)) { //якщо назви стовпців співпадають, то
+                                    Field field = cls.getDeclaredField(columnNameFromMetaDate); //створюємо поле класу Field і
+                                    // ініціалізуємо його по типу дженерика,
+                                    field.setAccessible(true); //відкриваємо доступ, щоб отримати доступ до приватного поля класу
 
-                                    field.set(t, rs.getObject(columnNameFromMetaDate)); //и устанавливаем значения для поля
+                                    field.set(t, rs.getObject(columnNameFromMetaDate)); //і встановлюємо значення для поля
                                 }
                             }
                         }
-                        res.add(t);
+                        res.add(t); //додаємо об'єкт t до списку результатів
                     }
                 }
             }
+        }
 
             return res;
         } catch (Exception ex) {
